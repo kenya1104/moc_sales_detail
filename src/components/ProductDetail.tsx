@@ -9,6 +9,11 @@ import {
   TabsTrigger,
 } from "./ui/tabs";
 import { Separator } from "./ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+} from "./ui/dialog";
 import productData from "../data/product.json";
 
 import {
@@ -18,40 +23,21 @@ import {
   Package,
   Truck,
   ArrowLeft,
+  Store,
+  LayoutGrid,
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-
-interface ProductDetailProps {
-  productId: string;
-  onBack: () => void;
-}
-
-interface ProductImage {
-  url: string;
-  alt: string;
-}
-
-interface SKU {
-  id: string;
-  grade: string; // 階級 (A~C)
-  size: string; // サイズ (SS~LL)
-  format: string; // 形態
-  price: number; // 参考価格
-  inStock: boolean;
-}
-
-interface ProducerGroup {
-  name: string;
-  prefecture: string; // 都道府県
-  city: string; // 市区町村
-  memberCount: number; // 構成員数
-  farmArea: string; // 圃場面積
-  description: string;
-  growingCharacteristics: Array<{
-    title: string;
-    description: string;
-  }>;
-}
+import type {
+  Product,
+  ProductDetailProps,
+  ProductImage,
+  SKU,
+  ProducerGroup,
+  ProductCharacteristics,
+  OriginCharacteristics,
+  GrowingCharacteristics,
+  sales_history,
+} from "../types/product";
 
 export default function ProductDetail({
   productId,
@@ -62,14 +48,25 @@ export default function ProductDetail({
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedSKU, setSelectedSKU] =
     useState<string>("sku-1");
+  const [expandedImage, setExpandedImage] = useState<{
+    url: string;
+    alt: string;
+  } | null>(null);
 
   // サンプルデータ
+  const productDataTyped = productData as typeof productData & {
+    productCharacteristics: ProductCharacteristics[];
+    originCharacteristics: OriginCharacteristics[];
+    growingCharacteristics: GrowingCharacteristics[];
+    salesHistory: sales_history[];
+  };
+  
   const product = {
     id: productId,
-    ...productData,
-    images: productData.images as ProductImage[],
-    skus: productData.skus as SKU[],
-    producerGroup: productData.producerGroup as ProducerGroup,
+    ...productDataTyped,
+    images: productDataTyped.images as ProductImage[],
+    skus: productDataTyped.skus as SKU[],
+    producerGroup: productDataTyped.producerGroup as ProducerGroup,
   };
 
   const selectedSKUData = product.skus.find(
@@ -145,7 +142,7 @@ export default function ProductDetail({
         <div className="space-y-8">
           {/* Product Title */}
           <div>
-            <h1 className="text-4xl mb-3">{product.variety}</h1>
+            <h1 className="text-4xl mb-3">{product.title}</h1>
           </div>
 
           {/* Appeal Points */}
@@ -158,15 +155,6 @@ export default function ProductDetail({
             </ul>
           </div>
 
-          {/* Origin and Season */}
-          <div className="flex flex-col gap-3 text-base">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                {product.season}
-              </span>
-            </div>
-          </div>
 
           <Separator />
 
@@ -259,17 +247,18 @@ export default function ProductDetail({
                 value="product"
                 className="data-[state=active]:bg-amber-100 text-base"
               >
-                商品詳細
+                売場
               </TabsTrigger>
             </TabsList>
 
             {/* 商品の特徴 */}
             <TabsContent
               value="description"
-              className="mt-6"
+              className="mt-6 space-y-4"
             >
+              <h3 className="text-2xl mb-4">商品の特徴</h3>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {product.productInfo.characteristics.map((item, index) => (
+                {product.productCharacteristics.map((item, index) => (
                   <Card key={index} className="p-6">
                     <div className="space-y-4">
                       <h5 className="text-2xl font-semibold">
@@ -282,6 +271,59 @@ export default function ProductDetail({
                   </Card>
                 ))}
               </div>
+              <Separator />
+
+              <h3 className="text-2xl mb-4">商品詳細</h3>
+              <div className="space-y-4">
+              
+                
+              {/* Origin and Season */}
+                <div>
+                  <h4 className="text-xl mb-2">販売期間</h4>
+                  <p className="text-base">
+                    {product.season}
+                  </p>
+                </div>
+                <Separator />
+
+
+                <div>
+                  <h4 className="text-xl mb-2">内容</h4>
+                  <p className="text-base">
+                    {product.content}
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="text-xl mb-2">種別</h4>
+                  <p className="text-base whitespace-pre-line">
+                    {product.varieties}
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="text-xl mb-2">産地</h4>
+                  <p className="text-base">
+                    {product.origin}
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="text-xl mb-2">栽培方法</h4>
+                  <p className="text-base">
+                    {product.growingMethod}
+                  </p>
+                </div>
+
+                <Separator />
+
+              </div>
             </TabsContent>
 
             {/* 産地・栽培 */}
@@ -289,17 +331,28 @@ export default function ProductDetail({
               value="group"
               className="mt-6 space-y-4"
             >
-              <h3 className="text-2xl mb-4">産地特徴</h3>
-                <div className="text-base leading-relaxed">
-                  {product.productInfo.originCharacteristics}
-                </div>
-                <Separator />
+              <h3 className="text-2xl mb-4">産地の特徴</h3>
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                {product.originCharacteristics.map((item, index) => (
+                  <Card key={index} className="p-8">
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold">
+                      {item.title}
+                    </h3>
+                    <p className="text-base leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+              </div>
+              <Separator />
 
-              <div className="space-y-4 mb-4">
-                <h3 className="text-2xl mb-4">栽培特徴</h3>
-                {/* Growing Method Card */}
-                {product.producerGroup.growingCharacteristics.map((item, index) => (
-                  <Card key={index} className="p-8 mb-4">
+              <h3 className="text-2xl mb-4">栽培の特徴</h3>
+              {/* Growing Method Card */}
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                {product.growingCharacteristics.map((item, index) => (
+                  <Card key={index} className="p-8">
                     <div className="space-y-4">
                       <h3 className="text-xl font-semibold">
                         {item.title}
@@ -325,8 +378,7 @@ export default function ProductDetail({
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        
+                      <div className="flex items-center gap-2 text-muted-foreground">                       
                         <span className="text-base">
                           都道府県
                         </span>
@@ -374,59 +426,120 @@ export default function ProductDetail({
                 </div>
             </TabsContent>
 
-
-
-            {/* 商品詳細 */}
+            {/* 売場 */}
             <TabsContent
               value="product"
               className="mt-6 space-y-4"
             >
-              <div className="space-y-8">
-                {/* Content */}
-                <div>
-                  <h4 className="text-xl mb-3">内容</h4>
-                  <p className="text-base">
-                    {product.productInfo.content}
-                  </p>
-                </div>
+              <h3 className="text-2xl mb-4">販売実績</h3>
+              <div className="grid grid-cols-2 gap-6">
+                {product.salesHistory && product.salesHistory.map((history, index) => (
+                  <Card key={index} className="p-6">
+                    <div className="space-y-5">
+                      {/* タイトル（小売り店） */}
+                      <h4 className="text-xl font-semibold">
+                        {history.retail_name}
+                      </h4>         
+                      {/* ヘッダー画像 */}
+                      <div
+                        className="w-32 h-32 bg-gray-100 flex items-center justify-center"
+                        onClick={() => setExpandedImage({
+                          url: history.headerIcon,
+                          alt: history.retail_name
+                        })}
+                      >
+                        <ImageWithFallback
+                          src={history.headerIcon}
+                          alt={history.retail_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                <Separator />
+                      {/* 詳細情報グリッド */}
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* 販売期間 */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="w-4 h-4" />
+                            <span className="text-sm">販売期間</span>
+                          </div>
+                          <div className="text-base">
+                            {new Date(history.start_date).toLocaleDateString('ja-JP', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                            <br />
+                            〜 {new Date(history.end_date).toLocaleDateString('ja-JP', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </div>
+                        </div>
 
-                {/* Varieties */}
-                <div>
-                  <h4 className="text-xl mb-3">種別</h4>
-                  <p className="text-base whitespace-pre-line">
-                    {product.productInfo.varieties}
-                  </p>
-                </div>
+                        {/* 販売量 */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Package className="w-4 h-4" />
+                            <span className="text-sm">販売量</span>
+                          </div>
+                          <div className="text-base font-semibold">
+                            {history.quantity}
+                          </div>
+                        </div>
 
-                <Separator />
-
-                {/* Origin */}
-                <div>
-                  <h4 className="text-xl mb-3">産地</h4>
-                  <p className="text-base">
-                    {product.productInfo.origin}
-                  </p>
-                </div>
-
-                <Separator />
-
-                {/* Origin */}
-                <div>
-                  <h4 className="text-xl mb-3">栽培方法</h4>
-                  <p className="text-base">
-                    {product.productInfo.growingMethod}
-                  </p>
-                </div>
-
-                <Separator />
-
+                        {/* 売場面積 */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <LayoutGrid className="w-4 h-4" />
+                            <span className="text-sm">売場面積</span>
+                          </div>
+                          <div className="text-base font-semibold">
+                            {history.floor_area}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator></Separator>
+                     
+                      {/* 備考 */}
+                      {history.description && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <div className="text-sm text-muted-foreground">
+                              備考
+                            </div>
+                            <p className="text-base leading-relaxed">
+                              {history.description}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                ))}
               </div>
             </TabsContent>
           </Tabs>
         </div>
       </div>
+
+      {/* 画像拡大表示ダイアログ */}
+      <Dialog open={!!expandedImage} onOpenChange={() => setExpandedImage(null)}>
+        <DialogContent className="max-w-5xl w-full p-0">
+          {expandedImage && (
+            <div className="relative w-full">
+              <ImageWithFallback
+                src={expandedImage.url}
+                alt={expandedImage.alt}
+                className="w-full h-auto"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
