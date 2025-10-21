@@ -39,7 +39,10 @@ import type {
   sales_history,
 } from "../types/product";
 
-export default function ProductDetail({
+import MaterialDetailProducts from "./MaterialDetailProducts.tsx";
+import MaterialDetailSales from "./MaterialDetailSales";
+
+export default function MaterialDetail({
   productId,
   onBack,
 }: ProductDetailProps) {
@@ -52,6 +55,7 @@ export default function ProductDetail({
     url: string;
     alt: string;
   } | null>(null);
+  const [showSalesDetail, setShowSalesDetail] = useState(false);
 
   // サンプルデータ
   const productDataTyped = productData as typeof productData & {
@@ -72,6 +76,23 @@ export default function ProductDetail({
   const selectedSKUData = product.skus.find(
     (sku) => sku.id === selectedSKU,
   );
+
+  // 販売実績詳細画面を表示する場合
+  if (showSalesDetail) {
+    return (
+      <div className="space-y-6 pb-12">
+        <Button
+          variant="ghost"
+          onClick={() => setShowSalesDetail(false)}
+          className="mb-4 text-base"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          商品詳細に戻る
+        </Button>
+        <MaterialDetailSales productId={productId} onBack={() => setShowSalesDetail(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-12">
@@ -160,73 +181,10 @@ export default function ProductDetail({
 
 
           {/* SKU Lineup */}
-          <div>
-            <h3 className="text-2xl mb-5">商品一覧</h3>
-            <div className="space-y-3">
-              {product.skus.map((sku) => (
-                <button
-                  key={sku.id}
-                  onClick={() =>
-                    sku.inStock && setSelectedSKU(sku.id)
-                  }
-                  disabled={!sku.inStock}
-                  className={`w-full p-5 rounded-lg border-2 transition-all text-left ${
-                    selectedSKU === sku.id
-                      ? "border-primary bg-primary/5"
-                      : sku.inStock
-                        ? "border-gray-200 hover:border-gray-300"
-                        : "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          selectedSKU === sku.id
-                            ? "border-primary"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {selectedSKU === sku.id && (
-                          <div className="w-3 h-3 rounded-full bg-primary" />
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-4 text-base">
-                          <span>
-                            <span className="text-muted-foreground">
-                              階級:
-                            </span>{" "}
-                            {sku.grade}
-                          </span>
-                          <span>
-                            <span className="text-muted-foreground">
-                              サイズ:
-                            </span>{" "}
-                            {sku.size}
-                          </span>
-                          <span>
-                            <span className="text-muted-foreground">
-                              形態:
-                            </span>{" "}
-                            {sku.format}
-                          </span>
-                        </div>
-                        {!sku.inStock && (
-                          <div className="text-sm text-red-500">
-                            売り切れ
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-lg">
-                      ¥{sku.price.toLocaleString()}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          <MaterialDetailProducts 
+            productId={product.id}
+            onBack={onBack}
+          />
 
           {/* Tabs */}
           <Tabs defaultValue="group" className="w-full">
@@ -247,11 +205,11 @@ export default function ProductDetail({
                 value="product"
                 className="data-[state=active]:bg-amber-100 text-base"
               >
-                売場
+                販売実績
               </TabsTrigger>
             </TabsList>
 
-            {/* 商品の特徴 */}
+            {/* 商品特徴 */}
             <TabsContent
               value="description"
               className="mt-6 space-y-4"
@@ -326,7 +284,7 @@ export default function ProductDetail({
               </div>
             </TabsContent>
 
-            {/* 産地・栽培 */}
+            {/* 産地・栽培特徴 */}
             <TabsContent
               value="group"
               className="mt-6 space-y-4"
@@ -426,120 +384,46 @@ export default function ProductDetail({
                 </div>
             </TabsContent>
 
-            {/* 売場 */}
+            {/* 販売実績 */}
             <TabsContent
               value="product"
               className="mt-6 space-y-4"
             >
-              <h3 className="text-2xl mb-4">販売実績</h3>
-              <div className="grid grid-cols-2 gap-6">
-                {product.salesHistory && product.salesHistory.map((history, index) => (
-                  <Card key={index} className="p-6">
-                    <div className="space-y-5">
-                      {/* タイトル（小売り店） */}
-                      <h4 className="text-xl font-semibold">
-                        {history.retail_name}
-                      </h4>         
-                      {/* ヘッダー画像 */}
-                      <div
-                        className="w-32 h-32 bg-gray-100 flex items-center justify-center"
-                        onClick={() => setExpandedImage({
-                          url: history.headerIcon,
-                          alt: history.retail_name
-                        })}
-                      >
-                        <ImageWithFallback
-                          src={history.headerIcon}
-                          alt={history.retail_name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
 
-                      {/* 詳細情報グリッド */}
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* 販売期間 */}
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            <span className="text-sm">販売期間</span>
-                          </div>
-                          <div className="text-base">
-                            {new Date(history.start_date).toLocaleDateString('ja-JP', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                            <br />
-                            〜 {new Date(history.end_date).toLocaleDateString('ja-JP', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </div>
-                        </div>
+            <h3 className="text-2xl mb-4">販売実績</h3>
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                {product.salesHistory.map((item, index) => (
+                  <Card 
+                    key={index} 
+                    className="p-8 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => setShowSalesDetail(true)}
+                   >
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold">
+                      販売時期：
+                    </h3>
+                    <p className="text-base leading-relaxed">
+                     {item.start_date} ~ {item.end_date}
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold">
+                      販売総量：
+                    </h3>
+                    <p className="text-base leading-relaxed">
+                      {item.total_quantity}
+                    </p>
+                  </div>
 
-                        {/* 販売量 */}
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Package className="w-4 h-4" />
-                            <span className="text-sm">販売量</span>
-                          </div>
-                          <div className="text-base font-semibold">
-                            {history.quantity}
-                          </div>
-                        </div>
-
-                        {/* 売場面積 */}
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <LayoutGrid className="w-4 h-4" />
-                            <span className="text-sm">売場面積</span>
-                          </div>
-                          <div className="text-base font-semibold">
-                            {history.floor_area}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <Separator></Separator>
-                     
-                      {/* 備考 */}
-                      {history.description && (
-                        <>
-                          <Separator />
-                          <div className="space-y-2">
-                            <div className="text-sm text-muted-foreground">
-                              備考
-                            </div>
-                            <p className="text-base leading-relaxed">
-                              {history.description}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                ))}
+                </Card>
+              ))}
               </div>
             </TabsContent>
           </Tabs>
         </div>
       </div>
 
-      {/* 画像拡大表示ダイアログ */}
-      <Dialog open={!!expandedImage} onOpenChange={() => setExpandedImage(null)}>
-        <DialogContent className="max-w-5xl w-full p-0">
-          {expandedImage && (
-            <div className="relative w-full">
-              <ImageWithFallback
-                src={expandedImage.url}
-                alt={expandedImage.alt}
-                className="w-full h-auto"
-              />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

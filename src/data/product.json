@@ -120,6 +120,13 @@
   ],
   "salesHistory": [
     {
+      "start_date": "2024-10-01(仮）",
+      "end_date": "2024-10-30(仮）",
+      "total_quantity": "50cs(仮）"
+    }
+  ],
+  "salesFloorHistory": [
+    {
       "headerIcon": "/images/daimaru.jpg",
       "retail_name": "サンフレッシュ大丸東京",
       "start_date": "2024-10-10(仮）",

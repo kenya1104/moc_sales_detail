@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { LogOut, User, ShoppingBag, Calendar } from "lucide-react";
-import ProductCatalog from "./ProductCatalog";
+import MaterialCatalog from "./MaterialCatalog";
 import ProductionCalendar from "./ProductionCalendar";
 
 interface CustomerDashboardProps {
@@ -67,7 +67,7 @@ export default function CustomerDashboard({ onLogout }: CustomerDashboardProps) 
                 青果の産地情報や商品情報が確認できます
               </p>
             </div>
-            <ProductCatalog />
+            <MaterialCatalog />
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-4">

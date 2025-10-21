@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Input } from "./ui/input.tsx";
+import { Button } from "./ui/button.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card.tsx";
+import { Badge } from "./ui/badge.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select.tsx";
 import { Search, ShoppingCart, Star, MapPin, Calendar } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
-import ProductDetail from "./ProductDetail";
+import { ImageWithFallback } from "./figma/ImageWithFallback.tsx";
+import ProductDetail from "./MaterialDetail.tsx";
 import type {Product} from "../types/product.ts";
 
 
@@ -25,7 +25,7 @@ const catalogProducts: Product[] = [
   },
 ];
 
-export default function ProductCatalog() {
+export default function MaterialCatalog() {
   const [products] = useState<Product[]>(catalogProducts);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("すべて");
