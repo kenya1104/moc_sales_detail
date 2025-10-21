@@ -52,7 +52,7 @@ export default function CustomerDashboard({ onLogout }: CustomerDashboardProps) 
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="catalog" className="flex items-center space-x-2">
               <ShoppingBag className="w-4 h-4" />
-              <span>青果カタログ</span>
+              <span>カタログ</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center space-x-2">
               <Calendar className="w-4 h-4" />
@@ -62,9 +62,9 @@ export default function CustomerDashboard({ onLogout }: CustomerDashboardProps) 
 
           <TabsContent value="catalog" className="space-y-4">
             <div className="border-l-4 border-blue-500 pl-4">
-              <h2>青果カタログ</h2>
+              <h2>カタログ</h2>
               <p className="text-sm text-muted-foreground">
-                青果の品種、産地、出荷時期の確認、価格検索ができます
+                青果の産地情報や商品情報が確認できます
               </p>
             </div>
             <ProductCatalog />
