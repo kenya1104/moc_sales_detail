@@ -1,0 +1,60 @@
+[
+  {
+    "materialId": "1",
+    "images": [
+      {
+        "url": "/images/queen/material/IMG_1.jpg",
+        "alt": "メイン"
+      },
+      {
+        "url": "/images/queen/material/IMG_2.jpg",
+        "alt": "収穫の様子"
+      },
+      {
+        "url": "/images/queen/material/IMG_3.jpg",
+        "alt": "畑の風景"
+      },
+      {
+        "url": "/images/queen/material/IMG_4.jpg",
+        "alt": "生産者"
+      },
+      {
+        "url": "/images/queen/material/IMG_5.jpg",
+        "alt": "生産者"
+      },
+      {
+        "url": "/images/queen/material/IMG_6.jpg",
+        "alt": "生産者"
+      },
+      {
+        "url": "/images/queen/material/IMG_7.jpg",
+        "alt": "収穫直後"
+      },
+      {
+        "url": "/images/queen/material/IMG_8.jpg",
+        "alt": "収穫直後"
+      }
+    ]
+  },
+  {
+    "materialId": "2",
+    "images": [
+      {
+        "url": "/images/tomato/material/SF1.png",
+        "alt": "メイン"
+      },
+      {
+        "url": "/images/tomato/material/SF2.png",
+        "alt": "メイン"
+      },
+      {
+        "url": "/images/tomato/material/SF3.png",
+        "alt": "メイン"
+      },
+      {
+        "url": "/images/tomato/material/SF4.png",
+        "alt": "メイン"
+      }
+    ]
+  }
+]

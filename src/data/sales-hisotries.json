@@ -1,0 +1,96 @@
+{
+  "materialId": "1",
+  "salesHistory": [
+    {
+      "id": "record-1",
+      "retail_name": "サンフレッシュ大丸東京",
+      "start_date": "2025-10-01(仮）",
+      "end_date": "2025-10-15(仮）",
+      "total_quantity": "50cs(仮）",
+      "floor_area": "1.5m²(仮）",
+      "description": "ギフト需要が高く、完売。リピート要望多数（仮）",
+      "headerIcon": "/images/daimaru.jpg",
+      "distributionPhases": [
+        {
+          "title": "出荷",
+          "location": "たけむらふぁーむ",
+          "images": [
+            {
+              "url": "/images/queen/material/IMG_8.jpg",
+              "alt": "収穫の様子"
+            },
+            {
+              "url": "/images/queen/material/IMG_2.jpg",
+              "alt": "選果の様子"
+            }
+          ],
+          "details": [
+            "選果：農協規格に基づき、7房・8房・9房での出荷",
+            "出荷：週1回",
+            "出荷形態：不織布付きP袋　（留め金別納で取引先が投げ込み）",
+            "物流：JIT　BOXでの出荷",
+            "形態：段ボール10kg"
+          ]
+        },
+        {
+          "title": "着荷",
+          "location": "大田市場・サンアグリ",
+          "images": [
+            {
+              "url": "/images/queen/sales/souko_1.jpg",
+              "alt": "配送センター"
+            },
+            {
+              "url": "/images/queen/sales/souko_2.jpg",
+              "alt": "物流倉庫"
+            },
+            {
+              "url": "/images/queen/sales/souko_3.jpg",
+              "alt": "冷蔵保管庫"
+            }
+          ],
+          "details": [
+            "温度管理：5〜10℃で保管（仮）",
+            "検品：品質の最終確認（仮）",
+            "仕分け：店舗別に振り分け（仮）",
+            "配送準備：クール便で輸送（仮）"
+          ]
+        },
+        {
+          "title": "販売",
+          "location": "サンフレッシュ大丸東京",
+          "images": [
+            {
+              "url": "/images/queen/sales/daimaru_1.jpg",
+              "alt": "青果売場"
+            },
+            {
+              "url": "/images/queen/sales/daimaru_2.jpg",
+              "alt": "スーパーマーケット青果コーナー"
+            },
+            {
+              "url": "/images/queen/sales/daimaru_3.jpg",
+              "alt": "果物ディスプレイ"
+            }
+          ],
+          "details": [
+            "陳列：目立つエンド陳列（仮）",
+            "温度管理：冷蔵ショーケース（仮）",
+            "POP設置：産地情報を訴求（仮）",
+            "試食対応：なし（仮）"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "record-2",
+      "retail_name": "海老名PA",
+      "start_date": "2025-10-10(仮）",
+      "end_date": "2025-10-15(仮）",
+      "total_quantity": "20cs(仮）",
+      "floor_area": "4.0m²(仮）",
+      "description": "特設コーナーでの展開。完売(仮）",
+      "headerIcon": "/images/ebina.jpg"
+    }
+  ]
+}

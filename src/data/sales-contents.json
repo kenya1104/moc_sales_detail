@@ -1,0 +1,38 @@
+{
+  "materialId": "1",
+  "contents": [
+    {
+      "id": "content-1",
+      "recordId": "record-1",
+      "title": "売場POP（A4サイズ）",
+      "type": "PDF",
+      "url": "#",
+      "createdDate": "2025年10月5日"
+    },
+    {
+      "id": "content-2",
+      "recordId": "record-1",
+      "title": "商品紹介HP",
+      "type": "Webページ",
+      "url": "https://public.kaogamieru.com/seasonal_products/queen_rouge/",
+      "createdDate": "2025年10月1日"
+    },
+    {
+      "id": "content-3",
+      "recordId": "record-1",
+      "title": "サイネージ（モニター供給）",
+      "type": "動画ファイル",
+      "url": "#",
+      "createdDate": "2025年9月28日"
+    },
+    {
+      "id": "content-4",
+      "recordId": "record-1",
+      "title": "リーフレット",
+      "type": "PDF",
+      "url": "#",
+      "createdDate": "2025年9月25日"
+    }
+  ]
+}
+

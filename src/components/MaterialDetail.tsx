@@ -1,95 +1,93 @@
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import { Badge } from "./ui/badge";
+import { useState } from "react";
+import { Button } from "./ui/button.tsx";
+import { Card } from "./ui/card.tsx";
+import { Badge } from "./ui/badge.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "./ui/tabs";
-import { Separator } from "./ui/separator";
+} from "./ui/tabs.tsx";
 import {
-  Dialog,
-  DialogContent,
-  DialogClose,
-} from "./ui/dialog";
-import productData from "../data/product.json";
-
-import {
-  Heart,
   MapPin,
-  Calendar,
-  Package,
-  Truck,
   ArrowLeft,
-  Store,
-  LayoutGrid,
+  Download,
+  ExternalLink,
 } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Separator } from "./ui/separator.tsx";
 import type {
-  Product,
-  ProductDetailProps,
-  ProductImage,
-  SKU,
-  ProducerGroup,
-  ProductCharacteristics,
-  OriginCharacteristics,
-  GrowingCharacteristics,
-  sales_history,
-} from "../types/product";
+  MaterialDetailProps,
+  MaterialCharacteristics,
+  MaterialOriginCharacteristics,
+  MaterialGrowingCharacteristics,
+} from "../types/type.ts";
 
+import materialsData from "../data/materials.json";
 import MaterialDetailProducts from "./MaterialDetailProducts.tsx";
-import MaterialDetailSales from "./MaterialDetailSales";
+import MaterialDetailImages from "./MaterialDetailImages.tsx";
+import salesHistoriesData from "../data/sales-hisotries.json";
+import salesContentsData from "../data/sales-contents.json";
+import SalesRecodrDetail from "./SalesRecordDetail.tsx";
+
+
 
 export default function MaterialDetail({
-  productId,
+  materialId,
   onBack,
-}: ProductDetailProps) {
-  const [selectedImageIndex, setSelectedImageIndex] =
-    useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [selectedSKU, setSelectedSKU] =
-    useState<string>("sku-1");
-  const [expandedImage, setExpandedImage] = useState<{
-    url: string;
-    alt: string;
-  } | null>(null);
+}: MaterialDetailProps) {
   const [showSalesDetail, setShowSalesDetail] = useState(false);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
 
   // サンプルデータ
-  const productDataTyped = productData as typeof productData & {
-    productCharacteristics: ProductCharacteristics[];
-    originCharacteristics: OriginCharacteristics[];
-    growingCharacteristics: GrowingCharacteristics[];
-    salesHistory: sales_history[];
-  };
+  const materialDataItem = materialsData.find(m => m.id === materialId);
+  console.log(materialDataItem);
   
-  const product = {
-    id: productId,
-    ...productDataTyped,
-    images: productDataTyped.images as ProductImage[],
-    skus: productDataTyped.skus as SKU[],
-    producerGroup: productDataTyped.producerGroup as ProducerGroup,
-  };
+  if (!materialDataItem) {
+    return <div>商品が見つかりません</div>;
+  }
 
-  const selectedSKUData = product.skus.find(
-    (sku) => sku.id === selectedSKU,
-  );
+  // 販売実績データを取得
+  const salesHistory = (salesHistoriesData as any).materialId === materialId 
+    ? (salesHistoriesData as any).salesHistory || []
+    : [];
+  
+  const material = {
+    id: materialId,
+    title: materialDataItem.title,
+    origin: materialDataItem.origin,
+    category: materialDataItem.category,
+    varieties: materialDataItem.varieties,
+    price: materialDataItem.price,
+    season: materialDataItem.season,
+    content: materialDataItem.content,
+    growingMethod: materialDataItem.growingMethod,
+    deliverySet: materialDataItem.deliverySet,
+    producerGroup: materialDataItem.producerGroup,
+    materialCharacteristics: materialDataItem.materialCharacteristics,
+    materialOriginCharacteristics: materialDataItem.materialOriginCharacteristics,
+    materialGrowingCharacteristics: materialDataItem.materialGrowingCharacteristics,
+    salesHistory: salesHistory,
+  };
 
   // 販売実績詳細画面を表示する場合
-  if (showSalesDetail) {
+  if (showSalesDetail && selectedRecordId) {
     return (
       <div className="space-y-6 pb-12">
         <Button
           variant="ghost"
-          onClick={() => setShowSalesDetail(false)}
+          onClick={() => {
+            setShowSalesDetail(false);
+            setSelectedRecordId(null);
+          }}
           className="mb-4 text-base"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
           商品詳細に戻る
         </Button>
-        <MaterialDetailSales productId={productId} onBack={() => setShowSalesDetail(false)} />
+        <SalesRecodrDetail recordId={selectedRecordId} onBack={() => {
+          setShowSalesDetail(false);
+          setSelectedRecordId(null);
+        }} />
       </div>
     );
   }
@@ -108,69 +106,23 @@ export default function MaterialDetail({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column - Images */}
-        <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-[4/3] bg-muted rounded-lg overflow-hidden">
-            <ImageWithFallback
-              src={product.images[selectedImageIndex].url}
-              alt={product.images[selectedImageIndex].alt}
-              className="w-full h-full object-cover"
-            />
-            {/* Favorite Button */}
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
-            >
-              <Heart
-                className={`w-5 h-5 ${
-                  isFavorite
-                    ? "fill-red-500 text-red-500"
-                    : "text-gray-400"
-                }`}
-              />
-            </button>
-            {/* Overlay Text */}
-            <div className="absolute top-8 left-8 text-white space-y-2">
-              <div className="text-4xl leading-tight">
-                {product.origin}
-              </div>
-            </div>
-          </div>
-
-          {/* Thumbnail Images */}
-          <div className="grid grid-cols-5 gap-2">
-            {product.images.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImageIndex(index)}
-                className={`aspect-[4/3] bg-muted rounded overflow-hidden border-2 transition-all ${
-                  selectedImageIndex === index
-                    ? "border-primary ring-2 ring-primary/20"
-                    : "border-transparent hover:border-gray-300"
-                }`}
-              >
-                <ImageWithFallback
-                  src={image.url}
-                  alt={image.alt}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+        <div className="space-y-8">
+          <MaterialDetailImages materialId={materialId} />
         </div>
+
 
         {/* Right Column - Product Info */}
         <div className="space-y-8">
           {/* Product Title */}
           <div>
-            <h1 className="text-4xl mb-3">{product.title}</h1>
+            <h1 className="text-4xl mb-3">{material.title}</h1>
           </div>
 
           {/* Appeal Points */}
           <div className="space-y-4 bg-amber-50 p-4 rounded-lg">
             <h3 className="text-3xl text--600">アピールポイント</h3>
             <ul className="space-y-3">
-              {product.deliverySet.map((item, index) => (
+              {material.deliverySet.map((item, index) => (
                 <li key={index} className="text-2xl">{item}</li>
               ))}
             </ul>
@@ -182,31 +134,16 @@ export default function MaterialDetail({
 
           {/* SKU Lineup */}
           <MaterialDetailProducts 
-            productId={product.id}
+            materialId={material.id}
             onBack={onBack}
           />
 
-          {/* Tabs */}
-          <Tabs defaultValue="group" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 h-12">
-              <TabsTrigger
-                value="description"
-                className="data-[state=active]:bg-amber-100 text-base"
-              >
-                商品説明
-              </TabsTrigger>
-              <TabsTrigger
-                value="group"
-                className="data-[state=active]:bg-amber-100 text-base"
-              >
-                産地・栽培
-              </TabsTrigger>
-              <TabsTrigger
-                value="product"
-                className="data-[state=active]:bg-amber-100 text-base"
-              >
-                販売実績
-              </TabsTrigger>
+          {/* Tab area */}
+          <Tabs defaultValue="description" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="description">商品</TabsTrigger>
+              <TabsTrigger value="group">産地・栽培</TabsTrigger>
+              <TabsTrigger value="sales">販売</TabsTrigger>
             </TabsList>
 
             {/* 商品特徴 */}
@@ -216,7 +153,7 @@ export default function MaterialDetail({
             >
               <h3 className="text-2xl mb-4">商品の特徴</h3>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {product.productCharacteristics.map((item, index) => (
+                {material.materialCharacteristics.map((item: MaterialCharacteristics, index: number) => (
                   <Card key={index} className="p-6">
                     <div className="space-y-4">
                       <h5 className="text-2xl font-semibold">
@@ -239,25 +176,15 @@ export default function MaterialDetail({
                 <div>
                   <h4 className="text-xl mb-2">販売期間</h4>
                   <p className="text-base">
-                    {product.season}
+                    {material.season}
                   </p>
                 </div>
-                <Separator />
-
-
-                <div>
-                  <h4 className="text-xl mb-2">内容</h4>
-                  <p className="text-base">
-                    {product.content}
-                  </p>
-                </div>
-
                 <Separator />
 
                 <div>
                   <h4 className="text-xl mb-2">種別</h4>
                   <p className="text-base whitespace-pre-line">
-                    {product.varieties}
+                    {material.varieties}
                   </p>
                 </div>
 
@@ -266,7 +193,7 @@ export default function MaterialDetail({
                 <div>
                   <h4 className="text-xl mb-2">産地</h4>
                   <p className="text-base">
-                    {product.origin}
+                    {material.origin}
                   </p>
                 </div>
 
@@ -275,7 +202,7 @@ export default function MaterialDetail({
                 <div>
                   <h4 className="text-xl mb-2">栽培方法</h4>
                   <p className="text-base">
-                    {product.growingMethod}
+                    {material.growingMethod}
                   </p>
                 </div>
 
@@ -291,7 +218,7 @@ export default function MaterialDetail({
             >
               <h3 className="text-2xl mb-4">産地の特徴</h3>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {product.originCharacteristics.map((item, index) => (
+                {material.materialOriginCharacteristics.map((item: MaterialOriginCharacteristics, index: number) => (
                   <Card key={index} className="p-8">
                   <div className="space-y-4">
                     <h3 className="text-xl font-semibold">
@@ -309,7 +236,7 @@ export default function MaterialDetail({
               <h3 className="text-2xl mb-4">栽培の特徴</h3>
               {/* Growing Method Card */}
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {product.growingCharacteristics.map((item, index) => (
+                {material.materialGrowingCharacteristics.map((item: MaterialGrowingCharacteristics, index: number) => (
                   <Card key={index} className="p-8">
                     <div className="space-y-4">
                       <h3 className="text-xl font-semibold">
@@ -330,7 +257,7 @@ export default function MaterialDetail({
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
                     <h3 className="text-2xl">
-                      {product.producerGroup.name}
+                      {material.producerGroup.name}
                     </h3>
                   </div>
 
@@ -342,7 +269,7 @@ export default function MaterialDetail({
                         </span>
                       </div>
                       <div className="text-xl">
-                        {product.producerGroup.prefecture}
+                        {material.producerGroup.prefecture}
                       </div>
                     </div>
 
@@ -351,7 +278,7 @@ export default function MaterialDetail({
                         市区町村
                       </div>
                       <div className="text-xl">
-                        {product.producerGroup.city}
+                        {material.producerGroup.city}
                       </div>
                     </div>
 
@@ -360,7 +287,7 @@ export default function MaterialDetail({
                         構成員数
                       </div>
                       <div className="text-xl">
-                        {product.producerGroup.memberCount}名
+                        {material.producerGroup.memberCount}名
                       </div>
                     </div>
 
@@ -369,7 +296,7 @@ export default function MaterialDetail({
                         圃場面積
                       </div>
                       <div className="text-xl">
-                        {product.producerGroup.farmArea}
+                        {material.producerGroup.farmArea}
                       </div>
                     </div>
                   </div>
@@ -377,7 +304,7 @@ export default function MaterialDetail({
                   <div>
                     <p className="text-base text-muted-foreground"> 生産者コメント</p>
                       <p className="text-base leading-relaxed">
-                        {product.producerGroup.description}
+                        {material.producerGroup.description}
                       </p>
                   </div>
 
@@ -386,38 +313,154 @@ export default function MaterialDetail({
 
             {/* 販売実績 */}
             <TabsContent
-              value="product"
+              value="sales"
               className="mt-6 space-y-4"
             >
 
+            {/* 実績（売場別） */}
             <h3 className="text-2xl mb-4">販売実績</h3>
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {product.salesHistory.map((item, index) => (
-                  <Card 
-                    key={index} 
-                    className="p-8 cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => setShowSalesDetail(true)}
-                   >
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">
-                      販売時期：
-                    </h3>
-                    <p className="text-base leading-relaxed">
-                     {item.start_date} ~ {item.end_date}
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">
-                      販売総量：
-                    </h3>
-                    <p className="text-base leading-relaxed">
-                      {item.total_quantity}
-                    </p>
-                  </div>
+              {salesHistory.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                  {salesHistory.map((history: any, index: number) => (
+                    <Card 
+                      key={index} 
+                      className="p-8 cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => {
+                        if (history.id && history.distributionPhases) {
+                          setSelectedRecordId(history.id);
+                          setShowSalesDetail(true);
+                        }
+                      }}
+                     >
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold">
+                        {history.retail_name}
+                      </h3>
+                      <div className="space-y-2">
+                        <p className="text-base leading-relaxed">
+                          販売期間：{history.start_date} ~ {history.end_date}
+                        </p>
+                        <p className="text-base leading-relaxed">
+                          販売量：{history.total_quantity}
+                        </p>
+                        <p className="text-base leading-relaxed">
+                          売場面積：{history.floor_area}
+                        </p>
+                        <p className="text-base leading-relaxed text-muted-foreground">
+                          {history.description}
+                        </p>
+                      </div>
+                      {history.distributionPhases && (
+                        <p className="text-sm text-amber-600">
+                          クリックして詳細を表示
+                        </p>
+                      )}
+                    </div>
 
+                  </Card>
+                ))}
+                </div>
+              ) : (
+                <Card className="p-8">
+                  <p className="text-base text-muted-foreground text-center">
+                    販売実績データはまだありません
+                  </p>
                 </Card>
-              ))}
-              </div>
+              )}
+
+            <Separator />
+
+            {/* 販促 */}
+            <h3 className="text-2xl mb-4">販促</h3>
+            <p className="text-base text-muted-foreground mb-6">
+              売場POPやHPなど、商品に関連するコンテンツを管理しています
+            </p>
+
+            {(() => {
+              // materialIdに基づいてcontentsを取得
+              const contents = (salesContentsData as any).materialId === materialId 
+                ? ((salesContentsData as any).contents || [])
+                : [];
+              
+              // salesHistoryからretail_nameを取得するためのマップ
+              const historyMap = new Map(
+                salesHistory.map((history: any) => [history.id, history.retail_name])
+              );
+
+              return contents.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {contents.map((content: any) => (
+                    <Card
+                      key={content.id}
+                      className="p-6 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 space-y-3">
+                          <div>
+                            <h4 className="text-lg mb-1">{content.title}</h4>
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="text-sm">
+                                {content.type}
+                              </Badge>
+                              <span className="text-sm text-muted-foreground">
+                                作成日: {content.createdDate}
+                              </span>
+                            </div>
+                            {content.recordId && historyMap.has(content.recordId) && (
+                              <p className="text-sm text-muted-foreground mt-2">
+                                {String(historyMap.get(content.recordId) || '')}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-sm"
+                              disabled={!content.url || content.url === '#'}
+                              onClick={(e: React.MouseEvent) => {
+                                e.stopPropagation();
+                                if (content.url && content.url !== '#') {
+                                  const link = document.createElement('a');
+                                  link.href = content.url;
+                                  link.download = content.title;
+                                  link.click();
+                                }
+                              }}
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              ダウンロード
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-sm"
+                              disabled={!content.url || content.url === '#'}
+                              onClick={(e: React.MouseEvent) => {
+                                e.stopPropagation();
+                                if (content.url && content.url !== '#') {
+                                  window.open(content.url, '_blank', 'noopener,noreferrer');
+                                }
+                              }}
+                            >
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              開く
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8">
+                  <p className="text-base text-muted-foreground text-center">
+                    販促コンテンツはまだありません
+                  </p>
+                </Card>
+              );
+            })()}
+            
             </TabsContent>
           </Tabs>
         </div>

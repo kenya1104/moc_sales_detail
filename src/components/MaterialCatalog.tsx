@@ -1,50 +1,54 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "./ui/input.tsx";
-import { Button } from "./ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card.tsx";
 import { Badge } from "./ui/badge.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select.tsx";
-import { Search, ShoppingCart, Star, MapPin, Calendar } from "lucide-react";
+import { Search, MapPin, Calendar } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback.tsx";
-import ProductDetail from "./MaterialDetail.tsx";
-import type {Product} from "../types/product.ts";
+import type {Material} from "../types/type.ts";
+import materialsData from "../data/materials.json";
 
+interface MaterialCatalogProps {
+  onSelectMaterial: (materialId: string) => void;
+}
 
-const catalogProducts: Product[] = [
-  {
-    id: "1",
-    origin: "長野県",
-    category: "ぶどう",
-    variety: "クイーンリュージュ",
-    price: 380,
-    season: "10月〜11月",
-    content: "長野県産 クイーンリュージュ 1房",
-    growingMethod: "土壌",
-    appeals: [],
-    imageUrl: "fresh red apples fruit",
-  },
-];
+export default function MaterialCatalog({ onSelectMaterial }: MaterialCatalogProps) {
+  // materials.jsonのデータをMaterial型に変換
+  const catalogMaterials: Material[] = useMemo(() => {
+    return materialsData.map((material) => ({
+      id: material.id,
+      origin: material.origin,
+      category: material.category,
+      variety: material.title,
+      price: material.price,
+      season: material.season,
+      content: material.content,  
+      growingMethod: material.growingMethod,
+      appeals: material.deliverySet || [],
+      imageUrl: material.category.toLowerCase(),
+      available: true,
+      description: material.producerGroup?.description || "",
+    }));
+  }, []);
 
-export default function MaterialCatalog() {
-  const [products] = useState<Product[]>(catalogProducts);
+  const [materials] = useState<Material[]>(catalogMaterials);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [sortBy, setSortBy] = useState("variety");
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const categories = [
     "すべて", "りんご", "みかん", "いちご", "ぶどう", "もも", "なし", 
     "トマト", "きゅうり", "なす", "ピーマン", "レタス", "キャベツ"
   ];
 
-  const filteredProducts = products
-    .filter(product => 
-      product.variety.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMaterials = materials
+    .filter(material => 
+      material.variety.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (material.description && material.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      material.category.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .filter(product => 
-      selectedCategory === "すべて" || product.category === selectedCategory
+    .filter(material => 
+      selectedCategory === "すべて" || material.category === selectedCategory
     )
     .sort((a, b) => {
       switch (sortBy) {
@@ -53,21 +57,11 @@ export default function MaterialCatalog() {
         case "price-high":
           return b.price - a.price;
         case "rating":
-          return b.rating - a.rating;
+          return (b.rating || 0) - (a.rating || 0);
         default:
           return a.variety.localeCompare(b.variety);
       }
     });
-
-  // Show detail view if a product is selected
-  if (selectedProductId) {
-    return (
-      <ProductDetail
-        productId={selectedProductId}
-        onBack={() => setSelectedProductId(null)}
-      />
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -109,19 +103,19 @@ export default function MaterialCatalog() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
+        {filteredMaterials.map((material) => (
           <Card 
-            key={product.id} 
+            key={material.id}
             className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => setSelectedProductId(product.id)}
+            onClick={() => onSelectMaterial(material.id)}
           >
             <div className="aspect-video bg-muted relative">
               <ImageWithFallback
-                src={`https://images.unsplash.com/400x300/?${product.imageUrl}`}
-                alt={product.variety}
+                src={`https://images.unsplash.com/400x300/?${material.imageUrl}`}
+                alt={material.variety}
                 className="w-full h-full object-cover"
               />
-              {!product.available && (
+              {!material.available && (
                 <div className="absolute top-2 right-2">
                   <Badge variant="destructive">出荷停止中</Badge>
                 </div>
@@ -130,36 +124,31 @@ export default function MaterialCatalog() {
             
             <CardHeader>
               <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{product.variety}</CardTitle>
-                <Badge variant="outline">{product.category}</Badge>
+                <CardTitle className="text-lg">{material.variety}</CardTitle>
+                <Badge variant="outline">{material.category}</Badge>
               </div>
               
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <MapPin className="w-3 h-3" />
-                  <span>{product.origin}</span>
+                  <span>{material.origin}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-3 h-3" />
-                  <span>{product.season}</span>
+                  <span>{material.season}</span>
                 </div>
               </div>
             </CardHeader>
             
             <CardContent>
               <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xl">
-                    ¥{product.price.toLocaleString()}
-                  </span>
-                </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
       
-      {filteredProducts.length === 0 && (
+      {filteredMaterials.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">該当する商品が見つかりませんでした。</p>
         </div>
