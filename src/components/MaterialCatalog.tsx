@@ -7,6 +7,7 @@ import { Search, MapPin, Calendar } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback.tsx";
 import type {Material} from "../types/type.ts";
 import materialsData from "../data/materials.json";
+import itemsData from "../data/items.json";
 
 interface MaterialCatalogProps {
   onSelectMaterial: (materialId: string) => void;
@@ -15,20 +16,26 @@ interface MaterialCatalogProps {
 export default function MaterialCatalog({ onSelectMaterial }: MaterialCatalogProps) {
   // materials.jsonのデータをMaterial型に変換
   const catalogMaterials: Material[] = useMemo(() => {
-    return materialsData.map((material) => ({
-      id: material.id,
-      origin: material.origin,
-      category: material.category,
-      variety: material.title,
-      price: material.price,
-      season: material.season,
-      content: material.content,  
-      growingMethod: material.growingMethod,
-      appeals: material.deliverySet || [],
-      imageUrl: material.category.toLowerCase(),
-      available: true,
-      description: material.producerGroup?.description || "",
-    }));
+    return materialsData.map((material) => {
+      // itemIdを使ってitemsDataから対応するitemを取得
+      const itemData = (itemsData as any[]).find(
+        (item: any) => item.id === material.itemId
+      );
+      const categoryName = itemData?.name || "未分類";
+      
+      return {
+        id: material.id,
+        origin: material.origin,
+        category: categoryName,
+        variety: material.title,
+        season: material.season,
+        growingMethod: material.growingMethod,
+        appeals: material.deliverySet || [],
+        imageUrl: categoryName.toLowerCase(),
+        available: true,
+        description: "",
+      };
+    });
   }, []);
 
   const [materials] = useState<Material[]>(catalogMaterials);
@@ -49,19 +56,7 @@ export default function MaterialCatalog({ onSelectMaterial }: MaterialCatalogPro
     )
     .filter(material => 
       selectedCategory === "すべて" || material.category === selectedCategory
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "rating":
-          return (b.rating || 0) - (a.rating || 0);
-        default:
-          return a.variety.localeCompare(b.variety);
-      }
-    });
+    );
 
   return (
     <div className="space-y-6">

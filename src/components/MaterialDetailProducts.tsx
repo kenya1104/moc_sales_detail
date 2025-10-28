@@ -1,17 +1,14 @@
 import { useState } from "react";
-import materialsData from "../data/materials.json";
+import productsData from "../data/products.json";
 import type { MaterialDetailProps } from "../types/type";
 
 export default function MaterialDetailProducts({materialId}: MaterialDetailProps) {
   const [selectedSKU, setSelectedSKU] = useState<string>("sku-1");
   
-  // materialIdに合致する素材を取得
-  const material = materialsData.find(
-    (m) => m.id === materialId
+  // materialIdに基づいて商品一覧を取得
+  const products = (productsData as any[]).filter(
+    (product: any) => product.materialId === materialId
   );
-
-  // 素材の商品一覧を取得
-  const products = material?.products || [];
 
 
   // 商品データが見つからない場合

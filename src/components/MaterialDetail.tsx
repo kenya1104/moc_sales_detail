@@ -23,10 +23,12 @@ import type {
 } from "../types/type.ts";
 
 import materialsData from "../data/materials.json";
+import itemsData from "../data/items.json";
 import MaterialDetailProducts from "./MaterialDetailProducts.tsx";
 import MaterialDetailImages from "./MaterialDetailImages.tsx";
 import salesHistoriesData from "../data/sales-hisotries.json";
 import salesContentsData from "../data/sales-contents.json";
+import producerGroupsData from "../data/producer-groups.json";
 import SalesRecodrDetail from "./SalesRecordDetail.tsx";
 
 
@@ -46,23 +48,34 @@ export default function MaterialDetail({
     return <div>商品が見つかりません</div>;
   }
 
+  // itemIdを使ってitemsDataから対応するitemを取得
+  const itemData = (itemsData as any[]).find(
+    (item: any) => item.id === materialDataItem.itemId
+  );
+
   // 販売実績データを取得
   const salesHistory = (salesHistoriesData as any).materialId === materialId 
     ? (salesHistoriesData as any).salesHistory || []
     : [];
   
+  // 生産者グループデータを取得
+  const producerGroupItem = (producerGroupsData as any[]).find(
+    (group: any) => group.materialID === materialId
+  );
+  
+  // producerGroupsData から見つからない場合は、materialsData のフォールバックを使用
+  const producerGroup = producerGroupItem || (materialDataItem as any).producerGroup;
+  
   const material = {
     id: materialId,
     title: materialDataItem.title,
     origin: materialDataItem.origin,
-    category: materialDataItem.category,
+    item: itemData?.name || "品目なし",
     varieties: materialDataItem.varieties,
-    price: materialDataItem.price,
     season: materialDataItem.season,
-    content: materialDataItem.content,
     growingMethod: materialDataItem.growingMethod,
     deliverySet: materialDataItem.deliverySet,
-    producerGroup: materialDataItem.producerGroup,
+    producerGroup: producerGroup,
     materialCharacteristics: materialDataItem.materialCharacteristics,
     materialOriginCharacteristics: materialDataItem.materialOriginCharacteristics,
     materialGrowingCharacteristics: materialDataItem.materialGrowingCharacteristics,
@@ -104,12 +117,11 @@ export default function MaterialDetail({
         カタログに戻る
       </Button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Images */}
         <div className="space-y-8">
           <MaterialDetailImages materialId={materialId} />
         </div>
-
 
         {/* Right Column - Product Info */}
         <div className="space-y-8">
@@ -128,9 +140,7 @@ export default function MaterialDetail({
             </ul>
           </div>
 
-
           <Separator />
-
 
           {/* SKU Lineup */}
           <MaterialDetailProducts 
@@ -139,11 +149,12 @@ export default function MaterialDetail({
           />
 
           {/* Tab area */}
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="description">商品</TabsTrigger>
-              <TabsTrigger value="group">産地・栽培</TabsTrigger>
-              <TabsTrigger value="sales">販売</TabsTrigger>
+          <Tabs defaultValue="description">
+            <TabsList className="!grid w-full grid-cols-4 h-auto">
+              <TabsTrigger value="description" className="text-sm px-1 py-1 whitespace-nowrap">商品</TabsTrigger>
+              <TabsTrigger value="group" className="text-sm px-1 py-1 whitespace-nowrap">産地</TabsTrigger>
+              <TabsTrigger value="sales-contents" className="text-sm px-1 py-1 whitespace-nowrap">販促</TabsTrigger>
+              <TabsTrigger value="sales-histories" className="text-sm px-1 py-1 whitespace-nowrap">実績</TabsTrigger>
             </TabsList>
 
             {/* 商品特徴 */}
@@ -182,18 +193,27 @@ export default function MaterialDetail({
                 <Separator />
 
                 <div>
-                  <h4 className="text-xl mb-2">種別</h4>
-                  <p className="text-base whitespace-pre-line">
-                    {material.varieties}
+                  <h4 className="text-xl mb-2">産地</h4>
+                  <p className="text-base">
+                    {material.origin}
                   </p>
                 </div>
 
                 <Separator />
 
                 <div>
-                  <h4 className="text-xl mb-2">産地</h4>
+                  <h4 className="text-xl mb-2">品目</h4>
                   <p className="text-base">
-                    {material.origin}
+                    {material.item}
+                  </p>
+                </div>
+                
+                <Separator />
+
+                <div>
+                  <h4 className="text-xl mb-2">品種</h4>
+                  <p className="text-base whitespace-pre-line">
+                    {material.varieties}
                   </p>
                 </div>
 
@@ -253,6 +273,7 @@ export default function MaterialDetail({
               <Separator />
               <h3 className="text-2xl mb-4">産地グループ</h3>
               {/* Producer Group Card */}
+              {material.producerGroup ? (
                 <div className="space-y-6">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
@@ -309,16 +330,111 @@ export default function MaterialDetail({
                   </div>
 
                 </div>
+              ) : (
+                <Card className="p-8">
+                  <p className="text-base text-muted-foreground text-center">
+                    産地グループ情報はまだありません
+                  </p>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* 販促 */}
+            <TabsContent
+              value="sales-contents"
+              className="mt-6 space-y-4"
+            >
+
+              <h3 className="text-2xl mb-4">販促コンテンツ</h3>
+              <p className="text-base text-muted-foreground mb-6">
+                売場POPやHPなど、商品に関連するコンテンツを管理しています
+              </p>
+
+              {(() => {
+                // materialIdに基づいてcontentsを取得
+                const contents = (salesContentsData as any[]).filter(
+                  (content: any) => content.materialId === materialId
+                );
+                
+                return contents.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {contents.map((content: any) => (
+                      <Card
+                        key={content.id}
+                        className="p-6 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-3">
+                            <div>
+                              <h4 className="text-lg mb-1">{content.title}</h4>
+                              <div className="flex items-center gap-3">
+                                <Badge variant="outline" className="text-sm">
+                                  {content.type}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  作成日: {content.createdDate}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-sm"
+                                disabled={!content.url || content.url === '#'}
+                                onClick={(e: React.MouseEvent) => {
+                                  e.stopPropagation();
+                                  if (content.url && content.url !== '#') {
+                                    const link = document.createElement('a');
+                                    link.href = content.url;
+                                    link.download = content.title;
+                                    link.click();
+                                  }
+                                }}
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                ダウンロード
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-sm"
+                                disabled={!content.url || content.url === '#'}
+                                onClick={(e: React.MouseEvent) => {
+                                  e.stopPropagation();
+                                  if (content.url && content.url !== '#') {
+                                    window.open(content.url, '_blank', 'noopener,noreferrer');
+                                  }
+                                }}
+                              >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                開く
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="p-8">
+                    <p className="text-base text-muted-foreground text-center">
+                      販促コンテンツはまだありません
+                    </p>
+                  </Card>
+                );
+              })()}
             </TabsContent>
 
             {/* 販売実績 */}
             <TabsContent
-              value="sales"
+              value="sales-histories"
               className="mt-6 space-y-4"
             >
-
-            {/* 実績（売場別） */}
-            <h3 className="text-2xl mb-4">販売実績</h3>
+            <h3 className="text-2xl mb-4">実績</h3>
+            <p className="text-base text-muted-foreground mb-6">
+                過去の販売経路と量を確認できます。
+            </p>
               {salesHistory.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                   {salesHistory.map((history: any, index: number) => (
@@ -367,102 +483,9 @@ export default function MaterialDetail({
                   </p>
                 </Card>
               )}
-
-            <Separator />
-
-            {/* 販促 */}
-            <h3 className="text-2xl mb-4">販促</h3>
-            <p className="text-base text-muted-foreground mb-6">
-              売場POPやHPなど、商品に関連するコンテンツを管理しています
-            </p>
-
-            {(() => {
-              // materialIdに基づいてcontentsを取得
-              const contents = (salesContentsData as any).materialId === materialId 
-                ? ((salesContentsData as any).contents || [])
-                : [];
-              
-              // salesHistoryからretail_nameを取得するためのマップ
-              const historyMap = new Map(
-                salesHistory.map((history: any) => [history.id, history.retail_name])
-              );
-
-              return contents.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {contents.map((content: any) => (
-                    <Card
-                      key={content.id}
-                      className="p-6 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 space-y-3">
-                          <div>
-                            <h4 className="text-lg mb-1">{content.title}</h4>
-                            <div className="flex items-center gap-3">
-                              <Badge variant="outline" className="text-sm">
-                                {content.type}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                作成日: {content.createdDate}
-                              </span>
-                            </div>
-                            {content.recordId && historyMap.has(content.recordId) && (
-                              <p className="text-sm text-muted-foreground mt-2">
-                                {String(historyMap.get(content.recordId) || '')}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-sm"
-                              disabled={!content.url || content.url === '#'}
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                if (content.url && content.url !== '#') {
-                                  const link = document.createElement('a');
-                                  link.href = content.url;
-                                  link.download = content.title;
-                                  link.click();
-                                }
-                              }}
-                            >
-                              <Download className="w-4 h-4 mr-2" />
-                              ダウンロード
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-sm"
-                              disabled={!content.url || content.url === '#'}
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                if (content.url && content.url !== '#') {
-                                  window.open(content.url, '_blank', 'noopener,noreferrer');
-                                }
-                              }}
-                            >
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              開く
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8">
-                  <p className="text-base text-muted-foreground text-center">
-                    販促コンテンツはまだありません
-                  </p>
-                </Card>
-              );
-            })()}
-            
             </TabsContent>
           </Tabs>
+
         </div>
       </div>
 

@@ -1,10 +1,10 @@
 [
   {
     "id": "1",
-    "title": "シャインマスカットを超える新品種『クイーンルージュ』",
+    "title": "長野松川町のぶどう",
     "origin": "長野県",
-    "category": "ぶどう",
-    "varieties": "果物 > ぶどう > クイーンルージュ®",
+    "itemId": "1",
+    "varieties": "クイーンルージュ®",
     "season": "10月上旬 〜 10月下旬",
     "growingMethod": "土壌",
     "deliverySet": [
@@ -12,33 +12,6 @@
       "★ シャインマスカットよりも皮が柔らかく、マスカットのさわやかな香りも残る",
       "★ 特徴的な栽培方法により房全体の糖度が高い"
     ],
-    "products":[
-      {
-        "id": "sku-1",
-        "grade": "",
-        "size": "",
-        "format": "箱詰め",
-        "price": 6500,
-        "inStock": true
-      },
-      {
-        "id": "sku-2",
-        "materialId": "1",
-        "grade": "",
-        "size": "",
-        "format": "バラ",
-        "price": 4500,
-        "inStock": false
-      }
-    ],
-    "producerGroup": {
-      "name": "たけむらふぁーむ",
-      "prefecture": "長野県",
-      "city": "松川町",
-      "memberCount": 1,
-      "farmArea": "-ha",
-      "description": "私たちが育てているのは長野県が進める三姉妹と言われる「シャインマスカット」「ナガノパープル」「クイーンルージュ」です。その中でも今一番力を入れているのが「クイーンルージュⓇ 」です。私たちは、食味にこだわるだけでなく、遊休農地を活用し地域のご高齢者が安全に元気で働ける環境を整備したり、減農薬のために草刈りロボットを活用したり、省エネを図ることで松川町の豊かな自然を未来に残せるように様々な取組みを行っております。"
-    },
     "materialCharacteristics": [
       {
         "title": "新しいぶどうの品種",
@@ -74,7 +47,7 @@
     "id": "2",
     "title": "富丸ムーチョ",
     "origin": "宮城県",
-    "category": "大玉とまと（丸トマト）",
+    "itemId": "2",
     "varieties": "青果 > とまと > 丸トマト",
     "season": "10月 〜 6月",
     "growingMethod": "土壌",
@@ -82,32 +55,6 @@
       "★ 味は糖度と酸味のバランスがよく、旨味成分のグルタミン酸を豊富に含む",
       "★ ゼリーが少なく、カットした際の型崩れがしにくい"
     ],
-    "products":[
-      {
-        "id": "sku-1",
-        "grade": "AB品",
-        "size": "M（24玉）",
-        "format": "箱詰め",
-        "price": "",
-        "inStock": true
-      },
-      {
-        "id": "sku-2",
-        "grade": "AB品",
-        "size": "L(20玉）",
-        "format": "箱詰め",
-        "price": "",
-        "inStock": true
-      }
-    ],
-    "producerGroup": {
-      "name": "サンフレッシュ小泉農園",
-      "prefecture": "宮城県",
-      "city": "気仙沼市",
-      "memberCount": 1,
-      "farmArea": "2ha",
-      "description": "震災の影響で打撃を受けた気仙沼市小泉地区の活性化と雇用の創出を担っています"
-    },
     "materialCharacteristics": [
       {
         "title": "富丸ムーチョとは",
