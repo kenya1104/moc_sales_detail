@@ -2,37 +2,33 @@
     {
         "id": "sku-1",
         "materialId": "1",
-        "grade": "",
-        "size": "",
-        "format": "箱詰め",
+        "shipping_year": "2025",
+        "shipping_start_season": "10月1週目",
+        "shipping_end_season": "10月4週目",
+        "label":"バラ 9粒",
+        "size": "9粒",
+        "unit_format": "バラ",
+        "quantity": "",
+        "shipping_format": "箱詰め",
+        "shipping_max_quantity": "ー",
+        "shipping_min_quantity": "ー",
         "price": 6500,
         "inStock": true
     },
     {
         "id": "sku-2",
         "materialId": "1",
-        "grade": "",
-        "size": "",
-        "format": "バラ",
+        "shipping_year": "2025",
+        "shipping_start_season": "10月1週目",
+        "shipping_end_season": "10月3週目",
+        "label":"バラ 8粒",
+        "size": "8粒",
+        "unit_format": "バラ",
+        "quantity": "",
+        "shipping_format": "箱詰め",
+        "shipping_max_quantity": "ー",
+        "shipping_min_quantity": "ー",
         "price": 4500,
         "inStock": false
-    },
-    {
-        "id": "sku-1",
-        "materialId": "2",
-        "grade": "AB品",
-        "size": "M（24玉）",
-        "format": "箱詰め",
-        "price": "",
-        "inStock": true
-      },
-      {
-        "id": "sku-2",
-        "materialId": "2",
-        "grade": "AB品",
-        "size": "L(20玉）",
-        "format": "箱詰め",
-        "price": "",
-        "inStock": true
-      }
+    }
 ]

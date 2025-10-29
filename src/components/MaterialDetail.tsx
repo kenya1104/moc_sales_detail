@@ -18,8 +18,6 @@ import { Separator } from "./ui/separator.tsx";
 import type {
   MaterialDetailProps,
   MaterialCharacteristics,
-  MaterialOriginCharacteristics,
-  MaterialGrowingCharacteristics,
 } from "../types/type.ts";
 
 import materialsData from "../data/materials.json";
@@ -77,8 +75,6 @@ export default function MaterialDetail({
     deliverySet: materialDataItem.deliverySet,
     producerGroup: producerGroup,
     materialCharacteristics: materialDataItem.materialCharacteristics,
-    materialOriginCharacteristics: materialDataItem.materialOriginCharacteristics,
-    materialGrowingCharacteristics: materialDataItem.materialGrowingCharacteristics,
     salesHistory: salesHistory,
   };
 
@@ -132,7 +128,6 @@ export default function MaterialDetail({
 
           {/* Appeal Points */}
           <div className="space-y-4 bg-amber-50 p-4 rounded-lg">
-            <h3 className="text-3xl text--600">アピールポイント</h3>
             <ul className="space-y-3">
               {material.deliverySet.map((item, index) => (
                 <li key={index} className="text-2xl">{item}</li>
@@ -140,52 +135,43 @@ export default function MaterialDetail({
             </ul>
           </div>
 
+          <h3 className="text-2xl mb-4">特徴</h3>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            {material.materialCharacteristics.map((item: MaterialCharacteristics, index: number) => (
+              <Card key={index} className="p-6">
+                <div className="space-y-4">
+                  <h5 className="text-2xl font-semibold">
+                    {item.title}
+                  </h5>
+                  <p className="text-lg leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
           <Separator />
-
-          {/* SKU Lineup */}
-          <MaterialDetailProducts 
-            materialId={material.id}
-            onBack={onBack}
-          />
-
           {/* Tab area */}
           <Tabs defaultValue="description">
             <TabsList className="!grid w-full grid-cols-4 h-auto">
-              <TabsTrigger value="description" className="text-sm px-1 py-1 whitespace-nowrap">商品</TabsTrigger>
-              <TabsTrigger value="group" className="text-sm px-1 py-1 whitespace-nowrap">産地</TabsTrigger>
+              <TabsTrigger value="description" className="text-sm px-1 py-1 whitespace-nowrap">基本</TabsTrigger>
+              <TabsTrigger value="sales-products" className="text-sm px-1 py-1 whitespace-nowrap">出荷商品</TabsTrigger>
               <TabsTrigger value="sales-contents" className="text-sm px-1 py-1 whitespace-nowrap">販促</TabsTrigger>
               <TabsTrigger value="sales-histories" className="text-sm px-1 py-1 whitespace-nowrap">実績</TabsTrigger>
             </TabsList>
 
-            {/* 商品特徴 */}
+            {/* 基本情報 */}
             <TabsContent
               value="description"
               className="mt-6 space-y-4"
             >
-              <h3 className="text-2xl mb-4">商品の特徴</h3>
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {material.materialCharacteristics.map((item: MaterialCharacteristics, index: number) => (
-                  <Card key={index} className="p-6">
-                    <div className="space-y-4">
-                      <h5 className="text-2xl font-semibold">
-                        {item.title}
-                      </h5>
-                      <p className="text-lg leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-              <Separator />
 
-              <h3 className="text-2xl mb-4">商品詳細</h3>
-              <div className="space-y-4">
-              
-                
+              <h3 className="text-2xl mb-4">概要</h3>
+              <div className="space-y-4 bg-gray-50 p-4 rounded-lg">   
               {/* Origin and Season */}
                 <div>
-                  <h4 className="text-xl mb-2">販売期間</h4>
+                  <h4 className="text-xl mb-2">出荷シーズン</h4>
                   <p className="text-base">
                     {material.season}
                   </p>
@@ -228,49 +214,16 @@ export default function MaterialDetail({
 
                 <Separator />
 
-              </div>
-            </TabsContent>
-
-            {/* 産地・栽培特徴 */}
-            <TabsContent
-              value="group"
-              className="mt-6 space-y-4"
-            >
-              <h3 className="text-2xl mb-4">産地の特徴</h3>
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {material.materialOriginCharacteristics.map((item: MaterialOriginCharacteristics, index: number) => (
-                  <Card key={index} className="p-8">
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">
-                      {item.title}
-                    </h3>
-                    <p className="text-base leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-              </div>
-              <Separator />
-
-              <h3 className="text-2xl mb-4">栽培の特徴</h3>
-              {/* Growing Method Card */}
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {material.materialGrowingCharacteristics.map((item: MaterialGrowingCharacteristics, index: number) => (
-                  <Card key={index} className="p-8">
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-semibold">
-                        {item.title}
-                      </h3>
-                      <p className="text-base leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
+                <div>
+                  <h4 className="text-xl mb-2">認証</h4>
+                  <p className="text-base">
+                    ー
+                  </p>
+                </div>
               </div>
 
               <Separator />
+
               <h3 className="text-2xl mb-4">産地グループ</h3>
               {/* Producer Group Card */}
               {material.producerGroup ? (
@@ -278,7 +231,7 @@ export default function MaterialDetail({
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
                     <h3 className="text-2xl">
-                      {material.producerGroup.name}
+                      {material.producerGroup.label}
                     </h3>
                   </div>
 
@@ -323,6 +276,13 @@ export default function MaterialDetail({
                   </div>
 
                   <div>
+                    <p className="text-base text-muted-foreground"> 産地の特徴</p>
+                      <p className="text-base leading-relaxed">
+                        {material.producerGroup.originCharacteristics}
+                      </p>
+                  </div>
+
+                  <div>
                     <p className="text-base text-muted-foreground"> 生産者コメント</p>
                       <p className="text-base leading-relaxed">
                         {material.producerGroup.description}
@@ -338,6 +298,22 @@ export default function MaterialDetail({
                 </Card>
               )}
             </TabsContent>
+
+
+            {/* 出荷商品一覧 */}
+            <TabsContent
+              value="sales-products"
+              className="mt-6 space-y-4"
+            >
+              <h3 className="text-2xl mb-4">出荷商品一覧</h3>
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <MaterialDetailProducts 
+                  materialId={material.id}
+                  onBack={onBack}
+                />
+              </div>
+            </TabsContent>
+
 
             {/* 販促 */}
             <TabsContent

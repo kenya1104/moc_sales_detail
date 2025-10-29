@@ -16,8 +16,7 @@ export default function MaterialDetailProducts({materialId}: MaterialDetailProps
     return (
       <div className="space-y-8">
         <div>
-          <h3 className="text-2xl mb-5">商品一覧</h3>
-          <p className="text-muted-foreground">この商品の商品データが見つかりません</p>
+          <p className="text-muted-foreground">この商材の規格データが見つかりません</p>
         </div>
       </div>
     );
@@ -26,7 +25,6 @@ export default function MaterialDetailProducts({materialId}: MaterialDetailProps
   return (
         <div className="space-y-8">
           <div>
-            <h3 className="text-2xl mb-5">商品一覧</h3>
             <div className="space-y-3">
               {products.map((product) => (
                 <button
@@ -57,35 +55,59 @@ export default function MaterialDetailProducts({materialId}: MaterialDetailProps
                         )}
                       </div>
                       <div className="space-y-1">
-                        <div className="flex items-center gap-4 text-base">
-                          <span>
+                        <h3 className="text-2xl mb-5">{product.label}</h3>
+                        <div>
+                          <span className="text-muted-foreground">出荷年:</span>
+                          <span className="text-base">{product.shipping_year}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">出荷予定時期:</span>
+                          <span className="text-base">{product.shipping_start_season} 〜 {product.shipping_end_season}</span>
+                        </div>
+                        <div>
                             <span className="text-muted-foreground">
-                              階級:
-                            </span>{" "}
-                            {product.grade}
-                          </span>
-                          <span>
-                            <span className="text-muted-foreground">
-                              サイズ:
+                              規格・サイズ:
                             </span>{" "}
                             {product.size}
-                          </span>
-                          <span>
-                            <span className="text-muted-foreground">
-                              形態:
-                            </span>{" "}
-                            {product.format}
-                          </span>
                         </div>
+                        <div>
+                            <span className="text-muted-foreground">
+                              形態（量目）:
+                            </span>{" "}
+                            {product.unit_format}
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground">
+                              入り数:
+                            </span>{" "}
+                            {product.quantity}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              出荷形態:
+                            </span>{" "}
+                            {product.shipping_format}
+                          </div>
+                          <div>
+                            <span>
+                              <span className="text-muted-foreground">
+                                最大数量:
+                              </span>{" "}
+                              {product.shipping_max_quantity}
+                            </span>
+                            <span>
+                              <span className="text-muted-foreground">
+                                最小数量:
+                              </span>{" "}
+                              {product.shipping_min_quantity}
+                            </span>
+                          </div>
                         {!product.inStock && (
                           <div className="text-sm text-red-500">
                             売り切れ
                           </div>
                         )}
                       </div>
-                    </div>
-                    <div className="text-lg">
-                      ¥{product.price.toLocaleString()}
                     </div>
                   </div>
                 </button>
